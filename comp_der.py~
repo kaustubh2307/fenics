@@ -1,0 +1,27 @@
+#solve w=grad(u) wwith no B.C
+# a(w,v)=L(v) for all w_belongs to function space V_g
+
+from dolfin import*
+from mshr import*
+
+#Define mesh and function space
+mesh=UnitSquareMesh(1,1)
+V = FunctionSpace(mesh,"Lagrange",1)
+u=Expression("1+x[0]*x[0]+2*x[1]*x[1]")
+
+# define Variational problem
+w=TrialFunction(V)
+v=TestFunction(V)
+a=inner(w,v)*dx
+L=inner(grad(u), v)*dx
+
+#solve
+problem=VariationalProblem(a,L)
+gradu = problem.solve()
+
+gradu_x, gradu_y = gradu.split(deepcopy=True)
+plot(gradu_x, title="x-component of grad(u)")
+plot(gradu_y, title="y-component of grad(u)")
+#plot gradu
+#plot(gradu, title="grad(u)")
+interactive()

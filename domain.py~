@@ -1,0 +1,9 @@
+from dolfin import *
+from mshr import *
+
+base = Rectangle(Point(0, 0), Point(10, 10))
+hole = Circle(Point(5,5),2.5)
+plot(generate_mesh(base - hole, 25))
+interactive()
+
+
