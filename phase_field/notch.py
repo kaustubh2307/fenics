@@ -1,45 +1,38 @@
-# fenics code for notched square plate subjected to tensile load 
+# function for notched square plate subjected to tensile load 
 
 from dolfin import*
 from mshr import*
 import numpy
 
+
 # define mesh and function space
-mesh=UnitSquareMesh(100,100)
-V=FunctionSpace(mesh,"Lagrange",1)
+def initial_notch(mesh,l0):
+	V1=FunctionSpace(mesh,"Lagrange",1)
 
-# define boundary conditions
-class bottom(SubDomain):
-	def inside(self,x,on_boundary):
-		return x[1]==0 and on_boundary
-class middle(SubDomain):
-	def inside(self,x,on_boundary):
-		return x[1]==0.5 and x[0]<=0.5 
+	# define boundary conditions
+	class Middle(SubDomain):
+		def inside(self,x,on_boundary):
+			return x[1]==0.0 and x[0]<=0.0
+	middle=Middle()
 
-bottom=bottom()
-middle=middle()
+	p0=Constant(1.0)
+	bc2=DirichletBC(V1,p0,middle)
 
-
-u0=Constant(0.0)
-bc1=DirichletBC(V,u0,bottom)
-
-p0=Constant(1.0)
-bc2=DirichletBC(V,p0,middle)
-
-bc=[bc1,bc2]
-#Define variational form
-phi=TrialFunction(V)
-v=TestFunction(V)
-l0=0.1
-a=l0*(inner(nabla_grad(phi),nabla_grad(v)))*dx +(1/l0)*(inner(phi,v)*dx)
-f=Constant(0.0)
-L=f*v*dx
-
-# compute solutions
-phi=Function(V)
-solve(a==L,phi,bc)
-plot(phi,axes=True)
-interactive()
-
+	bc_i=[bc2]
+	
+	#Define variational form
+	phi1=TrialFunction(V1)
+	v1=TestFunction(V1)
+	a1=l0*(inner(nabla_grad(phi1),nabla_grad(v1)))*dx +(1/l0)*(inner(phi1,v1)*dx)
+	f1=Constant(0.0)
+	L1=f1*v1*dx
+	
+	# compute solutions
+	phi1=Function(V1)
+	solve(a1==L1,phi1,bc_i)
+	plot(phi1,axes=True)
+	interactive()
+	return(phi1)
+	
 
 
